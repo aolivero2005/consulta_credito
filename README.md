@@ -7,6 +7,18 @@ Como executar localmente com Docker Compose
   2. A API ficará disponível em: http://localhost:8080
   3. O banco PostgreSQL ficará disponível em: localhost:5432
 
+Documentação OpenAPI (Swagger)
+- UI interativa (Swagger UI):
+  - http://localhost:8080/swagger-ui.html
+- Especificação OpenAPI (JSON):
+  - http://localhost:8080/v3/api-docs
+- Especificação OpenAPI (YAML):
+  - http://localhost:8080/v3/api-docs.yaml
+
+Observações:
+- O projeto usa springdoc-openapi (starter WebMVC UI).
+- Ao subir com Docker Compose, os links acima ficam disponíveis automaticamente.
+
 Migrações Flyway
 - As migrações são executadas automaticamente na inicialização:
   - V1__create_credito_table.sql: cria a tabela `credito`.
@@ -15,16 +27,6 @@ Migrações Flyway
 
 Execução com Flyway (padrão)
 - A aplicação usa Flyway para criar o schema e popular os dados automaticamente na inicialização, inclusive em Docker.
-- Caso já exista um volume antigo sem histórico do Flyway, recomenda-se limpar os volumes antes de subir novamente (ver seção "Solução de problemas").
-
-Solução de problemas (Flyway não cria tabela nem insere dados)
-- Se você já subiu os containers antes, o volume do Postgres pode estar mantendo um estado antigo sem o controle do Flyway. Nesse caso, derrube e remova o volume para um recomeço limpo:
-  - docker compose down -v
-  - docker compose up --build
-- Logs detalhados do Flyway foram habilitados. Verifique no log do container da API:
-  - docker logs -f credito-api
-  - Procure por mensagens de "Flyway Community Edition" e execução de migrações V1/V2.
-- A aplicação está configurada para usar explicitamente o schema `public` e criar schemas quando necessário (spring.flyway.default-schema=public e spring.flyway.create-schemas=true). Se seu banco usa um schema diferente, ajuste essas propriedades.
 
 Variáveis de ambiente (opcionais)
 - DB_NAME (padrão: credito_db)
