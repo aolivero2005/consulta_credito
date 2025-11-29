@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: credito-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-credito_db}
+      POSTGRES_USER: ${DB_USER:-credito_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-credito_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: credito-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-credito_db}
+      DB_USER: ${DB_USER:-credito_user}
+      DB_PASSWORD: ${DB_PASSWORD:-credito_pass}
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
+    driver: local
