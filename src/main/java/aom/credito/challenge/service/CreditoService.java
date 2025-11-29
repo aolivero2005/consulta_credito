@@ -9,6 +9,8 @@ import aom.credito.challenge.service.helper.CreditoResponseCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CreditoService {
@@ -16,14 +18,17 @@ public class CreditoService {
     private final CreditoResponseCreator creditoResponseCreator;
     private final CreditoRepository creditoRepository;
 
-    public CreditoResponse get(String numeroNfse){
-        Credito credito = getCreditoByNumeroNfse(numeroNfse);
-        return creditoResponseCreator.create(credito) ;
+    public CreditoResponse getCreditoByNumeroCredito(String numeroCredito){
+        return creditoRepository.findByNumeroCredito(numeroCredito)
+                .map(creditoResponseCreator::create)
+                .orElseThrow(() -> new CreditoNotFoundException("Credito com número " + numeroCredito + " não encontrada."));
     }
 
-    public Credito getCreditoByNumeroNfse(String numeroNfse) {
-        return creditoRepository.findByNumeroNfse(numeroNfse)
-                .orElseThrow(() -> new CreditoNotFoundException("Nfse com número " + numeroNfse + " não encontrada."));
+    public List<CreditoResponse> getAllByNumeroNfseOrderByIdAsc(String numeroNfse){
+        return creditoRepository.findAllByNumeroNfseOrderByIdAsc(numeroNfse)
+                .stream()
+                .map(creditoResponseCreator::create)
+                .toList();
     }
 
 }
