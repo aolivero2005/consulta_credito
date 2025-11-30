@@ -17,18 +17,29 @@ public class CreditoService {
 
     private final CreditoResponseCreator creditoResponseCreator;
     private final CreditoRepository creditoRepository;
+    private final KafkaProducerService kafkaProducerService;
 
     public CreditoResponse getCreditoByNumeroCredito(String numeroCredito){
-        return creditoRepository.findByNumeroCredito(numeroCredito)
+        CreditoResponse response = creditoRepository.findByNumeroCredito(numeroCredito)
                 .map(creditoResponseCreator::create)
                 .orElseThrow(() -> new CreditoNotFoundException("Credito com número " + numeroCredito + " não encontrada."));
+
+        // publish event (numeroNfse unknown in this lookup -> null)
+        kafkaProducerService.publishConsultaEvent(null, numeroCredito);
+
+        return response;
     }
 
     public List<CreditoResponse> getAllByNumeroNfseOrderByIdAsc(String numeroNfse){
-        return creditoRepository.findAllByNumeroNfseOrderByIdAsc(numeroNfse)
+        List<CreditoResponse> list = creditoRepository.findAllByNumeroNfseOrderByIdAsc(numeroNfse)
                 .stream()
                 .map(creditoResponseCreator::create)
                 .toList();
+
+        // publish event summarizing lookup
+        kafkaProducerService.publishConsultaEvent(numeroNfse, null);
+
+        return list;
     }
 
 }

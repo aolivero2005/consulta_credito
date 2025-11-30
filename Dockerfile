@@ -25,5 +25,6 @@ EXPOSE 8080
 
 # Variáveis de ambiente padrão (podem ser sobrescritas no docker-compose)
 ENV JAVA_OPTS=""
+ENV KAFKA_BOOTSTRAP_SERVERS="localhost:9092"
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
