@@ -27,9 +27,6 @@ public class KafkaProducerService {
     @Value("${kafka.topic.credito:creditos-consulta}")
     private String creditoTopic;
 
-    // How long to wait when adapting a raw Future by calling get(). Tunable if needed.
-    private static final long ADAPT_GET_TIMEOUT_SECONDS = 30;
-
     /**
      * Publish a small event to Kafka containing the lookup keys and a timestamp.
      * This method is non-blocking and will log success/failure asynchronously.
@@ -41,9 +38,7 @@ public class KafkaProducerService {
         payload.put("timestamp", Instant.now().toString());
 
         try {
-
             final String message = OBJECT_MAPPER.writeValueAsString(payload);
-
             kafkaTemplate.send(creditoTopic, UUID.randomUUID().toString(), message);
 
         } catch (JsonProcessingException e) {
