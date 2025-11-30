@@ -1,4 +1,3 @@
-
 Como executar localmente com Docker Compose
 - Pré‑requisitos: Docker e Docker Compose instalados.
 - Passos:
@@ -51,6 +50,11 @@ Endpoints
     - /api/creditos/7891011
     - /api/creditos/1122334
 
-Comandos úteis
-- Parar containers: docker compose down
-- Remover volumes (apaga dados do Postgres): docker compose down -v
+Kafka (testing)
+
+- Topic por defecto: `creditos-consulta`
+- Variável de ambiente usada pela aplicação: `KAFKA_BOOTSTRAP_SERVERS` (em `docker-compose.yml` está configurada como `kafka:29092` para comunicação interna). Se você executar a aplicação localmente sem Docker, o valor padrão em `application.properties` é `localhost:9092`.
+
+Conectar do host (localhost:9092)
+
+- Se você iniciar os serviços com `docker compose up --build`, o broker Kafka estará exposto em `localhost:9092` (mapeamento em `docker-compose.yml`). A partir do host, você pode usar uma imagem do Kafka para executar clientes. No Windows, evite `--network=host`; em vez disso, use `docker compose exec` ou conecte-se diretamente a `localhost:9092` se a imagem do cliente estiver sendo executada no host.
